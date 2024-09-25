@@ -1,0 +1,24 @@
+Resources:
+  MyEc2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: "ami-0e86e20dae9224db8"
+      KeyName: #Insertar tu KeyName
+      InstanceType: "t2.micro"
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sdm"
+        Ebs: 
+          VolumeType: "gp3"
+          DeleteOnTermination: "true"
+          VolumeSize: "8"
+      SecurityGroups:
+      - !Ref InstanceSecurityGroup
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
