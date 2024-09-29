@@ -1,0 +1,51 @@
+Parameters:
+  Ec2AMI:
+    Type: String
+    Description: Lista de AMIs para utilizar en nuestro despligue
+    Default: ami-0e86e20dae9224db8
+  SGPort:
+    Type: Number
+    Description: Puerto a utilizar en nuestro grupo de seguridad para habilitar trafico http
+    Default: 80 
+  NombreDeLLave:
+    Description: Nombre de una llave valida para conectarse por ssh o rdp
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair. # AWS nos va a proporcionar una lista de todas las llaves que tenemos
+  TipoInstancia:
+    Description: El tipo de instancia a utilizar.
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro] # Nos deveulve un array con todos los recursos que guardemos en esta lista. 
+    ConstraintDescription: Debe de ser un tipo de instancia valida. en mi caso seleccione las disponibles para free tier
+  IPDeIngreso:
+    Description: Ip de donde nos prendemos conectar.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    Default: 0.0.0.0/0
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2}) # Hace un regex para deliminar que datos podemos insertar.
+    ConstraintDescription: debe de ser una IP valida con la forma de CIDR x.x.x.x/x.
+Resources:
+  MyEc2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref Ec2AMI
+      KeyName: !Ref NombreDeLLave
+      InstanceType: !Ref TipoInstancia
+      BlockDeviceMappings:
+      - DeviceName: "/dev/sdm"
+        Ebs: 
+          VolumeType: "gp3"
+          DeleteOnTermination: "true"
+          VolumeSize: "8"
+      SecurityGroups:
+      - !Ref InstanceSecurityGroup
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref SGPort
+          ToPort: !Ref SGPort
+          CidrIp: !Ref IPDeIngreso
