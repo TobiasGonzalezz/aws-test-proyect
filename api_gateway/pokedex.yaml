@@ -8,7 +8,7 @@ Resources:
     Type: AWS::ApiGateway::Resource
     Properties:
       ParentId: !GetAtt MyApiGateway.RootResourceId
-      PathPart: pokemon
+      PathPart: pokedex
       RestApiId: !Ref MyApiGateway
 
   MyApiGatewayMethod:
@@ -22,12 +22,18 @@ Resources:
         IntegrationHttpMethod: POST
         Type: AWS_PROXY
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: Empty
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: "'*'"
 
   MyLambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: PokedexLambda
-      Handler: pokedex.handler
+      Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.12
       Code:
@@ -79,7 +85,7 @@ Resources:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
       Policies:
-        - PolicyName: LambdaBasicExecution
+        - PolicyName: LambdaExecutionPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -88,7 +94,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: arn:aws:logs:*:*:*
+                Resource: "*"
 
   ApiGatewayPermission:
     Type: AWS::Lambda::Permission
@@ -96,3 +102,11 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !Ref MyLambdaFunction
       Principal: apigateway.amazonaws.com
+
+  # Recurso para crear el Deployment
+  MyApiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref MyApiGateway
+      StageName: prod  # Define el nombre del stage (por ejemplo, 'prod')
+    DependsOn: MyApiGatewayMethod  # Asegúrate que el deployment ocurra después de que se hayan definido los métodos.
