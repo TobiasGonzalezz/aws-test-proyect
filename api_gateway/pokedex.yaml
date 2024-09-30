@@ -1,0 +1,98 @@
+Resources:
+  MyApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: PokedexApi
+
+  MyApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt MyApiGateway.RootResourceId
+      PathPart: pokemon
+      RestApiId: !Ref MyApiGateway
+
+  MyApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      HttpMethod: GET
+      ResourceId: !Ref MyApiGatewayResource
+      RestApiId: !Ref MyApiGateway
+      AuthorizationType: NONE
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MyLambdaFunction.Arn}/invocations
+
+  MyLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: PokedexLambda
+      Handler: pokedex.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Runtime: python3.12
+      Code:
+        ZipFile: |
+          import json
+          base_de_pokedatos = {
+              "charmander": {
+                  "no.": 4,
+                  "tipo": "fuego",
+                  "color": "rojo"
+              },
+              "squirtle": {
+                  "no.": 7,
+                  "tipo": "agua",
+                  "color": "azul"
+              },
+              "bulbasaur": {
+                  "no.": 1,
+                  "tipo": "planta",
+                  "color": "verde"
+              }
+          }
+          def handler(event, context):
+              print(event)
+              if "queryStringParameters" not in event or "pokemon" not in event["queryStringParameters"]:
+                  return {
+                      'statusCode': 400,
+                      'body': json.dumps("No se mandó ningún Pokémon")
+                  }
+              pokemon_solicitado = event["queryStringParameters"]["pokemon"]
+              if pokemon_solicitado in base_de_pokedatos:
+                  return {
+                      'statusCode': 200,
+                      'body': json.dumps(base_de_pokedatos[pokemon_solicitado])
+                  }
+              return {
+                  'statusCode': 404,
+                  'body': json.dumps("No hay registros para ese Pokémon")
+              }
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  ApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref MyLambdaFunction
+      Principal: apigateway.amazonaws.com
