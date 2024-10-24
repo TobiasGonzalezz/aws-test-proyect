@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  ReportesSQS
+
+  SAM Template for LambdaConsumer and LambdaResponse
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  # Definir la cola SQS
+  QueueReport:
+    Type: AWS::SQS::Queue
+    Properties: 
+      QueueName: QueueReport
+
+  # Lambda que envía un mensaje a la cola SQS
+  LambdaResponse:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: lambda_response/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      # Policies:
+      #   - SQSWritePolicy:
+      #       QueueName: !GetAtt QueueReport.QueueName
+      # DestinationConfig:
+      #   OnFailure:
+      #     Destination: !GetAtt QueueReport.Arn  # Enviar errores a la cola SQS
+
+
+  # Lambda que consume el mensaje de SQS
+  LambdaConsumer:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: lambda_consumer/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Policies:
+        - SQSPollerPolicy: # Permite a Lambda leer de SQS
+            QueueName: !GetAtt QueueReport.QueueName
+      Environment:
+        Variables:
+          QUEUE_URL: !GetAtt QueueReport.Arn # Pasar la ARN de la cola a Lambda
+
+Outputs:
+  LambdaConsumerArn:
+    Description: "Lambda Consumer ARN"
+    Value: !GetAtt LambdaConsumer.Arn
+
+  LambdaResponseArn:
+    Description: "Lambda Response ARN"
+    Value: !GetAtt LambdaResponse.Arn
+
+  SQSQueueUrl:
+    Description: "URL of the SQS queue"
+    Value: !Ref QueueReport
