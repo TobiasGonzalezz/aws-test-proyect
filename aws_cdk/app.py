@@ -5,6 +5,6 @@ from stacks.lambda_functions_stack import LambdaFunctionsStack
 
 app = App()
 
-LambdaFunctionsStack(app, "LambdaFunctionsStack")
+LambdaFunctionsStack(app, "LambdaFunctionsStack") #"LambdaFunctionsStack" -> Nombre del stack
 
 app.synth()
