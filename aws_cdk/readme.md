@@ -15,6 +15,14 @@ Poder levantar y bajar lambdas de manera rapida e eficiente utilizando SDK. Cóm
 1. `cdk diff` para ver los cambios
 2. `cdk deploy --region us-east-1 --profile default` para hacer deploy de los cambios
 
+# Como realizar pruebas locales:
+1. `cdk synth` que nos devuelve en consola el contenido que debemos pegar en el archivo template.yml para que podamos trabajar nuestro proyecto como si fuera sam, nos sirve para poder tirar comandos como `sam local invoke`
+2. tener SAM correctamente instalado.
+3. Utilizar `sam local invoke` y ver las opciones que nos aparece utizar la que necesitemos ejemplo:
+`$ sam local invoke`:
+Error: You must provide a function logical ID when there are more than one functions in your template. Possible options in your template: ['horariosMundialFunction', 'usuariosRolesFunction']
+4. `$ sam local invoke horariosMundialFunction` para invocar la función y ver su respuesta.
+
 # Errores comunes de CDK:
 1. This CDK deployment requires bootstrap stack version '6', but during the confirmation via SSM parameter /cdk-bootstrap/hnb659fds/version the following error occurred: AccessDeniedException. Debemos enviar el comando `cdk bootstrap` que va a levantar todos los permisos para que nuestro rol/usuario pueda utilizar esta configuración.
 2.  

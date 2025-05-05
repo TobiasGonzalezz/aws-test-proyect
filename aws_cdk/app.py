@@ -2,9 +2,15 @@
 
 from aws_cdk import App
 from stacks.lambda_functions_stack import LambdaFunctionsStack
+from tools import generate_template_lambda
 
+print("Iniciando la aplicación CDK...")
 app = App()
 
-LambdaFunctionsStack(app, "LambdaFunctionsStack") #"LambdaFunctionsStack" -> Nombre del stack
+# Crear el stack
+stack_name = "LambdaFunctionsStack"
+LambdaFunctionsStack(app, stack_name)
+print("Stack creado:", stack_name)
 
-app.synth()
+# Generar el template
+generate_template_lambda(app, stack_name)

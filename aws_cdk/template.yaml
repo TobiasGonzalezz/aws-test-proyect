@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  horariosMundialFunction:
+    Properties:
+      CodeUri: cdk.out/asset.8027364b1cb5a5297d42b60ddaa04bf9dfa118dce102bba917c8a8cbda86a4cf
+      FunctionName: horariosMundialFunction
+      Handler: app.lambda_handler
+      Layers:
+      - arn:aws:lambda:us-east-1:533267266042:layer:layer-opta:1
+      MemorySize: 128
+      Runtime: python3.12
+      Timeout: 30
+    Type: AWS::Serverless::Function
+  usuariosRolesFunction:
+    Properties:
+      CodeUri: cdk.out/asset.8766112711463c8cf21420e758643dbec0894b0c8c0a6d547b79d677d7eb3f01
+      FunctionName: usuariosRolesFunction
+      Handler: app.lambda_handler
+      MemorySize: 256
+      Runtime: python3.12
+      Timeout: 30
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
