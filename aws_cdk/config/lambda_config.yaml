@@ -1,0 +1,19 @@
+layers:
+  - name: opta-layer
+    arn_prefix: arn:aws:lambda:us-east-1:533267266042:layer:layer-opta
+    version: 1
+
+lambdas:
+  horariosMundialFunction:
+    timeout: 30
+    layers:
+      - name: opta-layer
+
+  usuariosRolesFunction:
+    memory: 256
+    timeout: 30
+    # pasarle solo el nombre del cron
+    cron:
+      name: usuariosRolesFunction
+      schedule: cron(0 12 * * ? *) # every day at 12:00 UTC
+      enabled: false

@@ -1,12 +1,23 @@
 Poder levantar y bajar lambdas de manera rapida e eficiente utilizando SDK. Cómo Usarlo
 
 # Como levantar localmente el CDK:
-## Dar permisos de ejecución al script:
+<!-- ## Dar permisos de ejecución al script:
 `chmod +x local_deploy.sh`
 
 ## Ejecuta el script:
-`./local_deploy.sh`
+`./local_deploy.sh` -->
+1. Utilizar una versión estable de WSL
+2. Realizar un entorno virutal de venv con py 3.12
+3. Instalar los requirements.txt
+4. Instalar sudo npm install -g aws-cdk
 
+# Como ejecutar los comandos de CDK:
+1. `cdk diff` para ver los cambios
+2. `cdk deploy --region us-east-1 --profile default` para hacer deploy de los cambios
+
+# Errores comunes de CDK:
+1. This CDK deployment requires bootstrap stack version '6', but during the confirmation via SSM parameter /cdk-bootstrap/hnb659fds/version the following error occurred: AccessDeniedException. Debemos enviar el comando `cdk bootstrap` que va a levantar todos los permisos para que nuestro rol/usuario pueda utilizar esta configuración.
+2.  
 ## Como ver directorio de carpetas en ubuntu
 sudo apt install tree  # Para sistemas basados en Debian/Ubuntu
 `tree -L 2`
