@@ -1,0 +1,31 @@
+{
+    "StartAt": "ParallelState",
+    "States": {
+        "ParallelState": {
+            "Type": "Parallel",
+            "Branches": [
+                {
+                    "StartAt": "Lambda1",
+                    "States": {
+                        "Lambda1": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ParallelLambda1",
+                            "End": true
+                        }
+                    }
+                },
+                {
+                    "StartAt": "Lambda2",
+                    "States": {
+                        "Lambda2": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:lambda:us-east-1:123456789012:function:ParallelLambda2",
+                            "End": true
+                        }
+                    }
+                }
+            ],
+            "End": true
+        }
+    }
+}

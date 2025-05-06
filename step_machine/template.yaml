@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Parallel Lambda Execution Template
+
+  Sample SAM Template for executing two Lambda functions in parallel
+
+Resources:
+  ParallelStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/stepmachine.asl.json
+      DefinitionSubstitutions:
+        ParallelLambda1Arn: !GetAtt ParallelLambda1.Arn
+        ParallelLambda2Arn: !GetAtt ParallelLambda2.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ParallelLambda1
+        - LambdaInvokePolicy:
+            FunctionName: !Ref ParallelLambda2
+
+  ParallelLambda1:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/lambda_1/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+
+  ParallelLambda2:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/lambda_2/
+      Handler: app.lambda_handler
+      Runtime: python3.10
+      Architectures:
+        - x86_64
+
+Outputs:
+  ParallelStateMachineArn:
+    Description: "Parallel State Machine ARN"
+    Value: !Ref ParallelStateMachine
+  ParallelStateMachineRoleArn:
+    Description: "IAM Role created for Parallel State Machine"
+    Value: !GetAtt ParallelStateMachineRole.Arn
