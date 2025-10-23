@@ -139,7 +139,8 @@ Separar raw y analytics es clave para orden y performance.
 Siempre configurar Budgets de costos antes de experimentar.
 
 ---
-#6 Como guardar los archivos
+
+## 7. Como guardar los archivos
 elecciones-s3.XXXX.com.ar/2025/pba_legislativas/backup_indra_escuelas/XXXX_XXXxxxx/resultados/distrito_02_categoria_5_seccion_provincial_1_seccion_016.json
 
 Esta es una manera de guardar los archivos lo cual no es lo mas practico para ATHENA.
@@ -155,3 +156,4 @@ s3://aws-elecciones/backupindra/2025-10-22T23:00Z/distrito_id=101/categoria_id=1
 s3://aws-elecciones/backupindra/2025-10-22T23:00Z/distrito_id=101/categoria_id=1/data.json
 ```
 Crear carpetas (prefijos) en Amazon S3 no tiene costo, por lo tanto esta estructura es la más eficiente y escalable para luego consultar con Athena, Glue o Redshift Spectrum.
+
