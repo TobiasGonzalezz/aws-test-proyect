@@ -117,6 +117,7 @@ Copiar c贸digo
    external_location = 's3://analytics-elecciones-s3.xXXx/athena/escuelas_parquet/'
  ) AS
  SELECT * FROM elecciones.escuelas_json_min;
+```
 Construir queries de an谩lisis:
 
 Ranking de participaci贸n por escuela.
@@ -134,4 +135,23 @@ S3/Athena no deben usarse como almacenamiento de descargas masivas a PC local 鈫
 
 Separar raw y analytics es clave para orden y performance.
 
+
 Siempre configurar Budgets de costos antes de experimentar.
+
+---
+#6 Como guardar los archivos
+elecciones-s3.XXXX.com.ar/2025/pba_legislativas/backup_indra_escuelas/XXXX_XXXxxxx/resultados/distrito_02_categoria_5_seccion_provincial_1_seccion_016.json
+
+Esta es una manera de guardar los archivos lo cual no es lo mas practico para ATHENA.
+
+Se recomienda organizar los datos en S3 utilizando prefijos con claves particionadas, de la siguiente forma:
+s3://aws-elecciones/backupindra/{timestamp}/distrito_id={id}/categoria_id={id}/seccion_id={id}/escuela_id={id}/mesa_id={id}/data.json
+
+Cada carpeta debe contener un 煤nico archivo data.json con la informaci贸n correspondiente a ese nivel (mesa, escuela, secci贸n, etc.).
+
+```sql
+s3://aws-elecciones/backupindra/2025-10-22T23:00Z/distrito_id=101/categoria_id=1/seccion_id=1/escuela_id=1/mesa_id=2300/data.json
+s3://aws-elecciones/backupindra/2025-10-22T23:00Z/distrito_id=101/categoria_id=1/seccion_id=1/escuela_id=1/data.json
+s3://aws-elecciones/backupindra/2025-10-22T23:00Z/distrito_id=101/categoria_id=1/data.json
+```
+Crear carpetas (prefijos) en Amazon S3 no tiene costo, por lo tanto esta estructura es la m谩s eficiente y escalable para luego consultar con Athena, Glue o Redshift Spectrum.
